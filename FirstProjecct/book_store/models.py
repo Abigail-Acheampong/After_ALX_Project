@@ -1,6 +1,17 @@
 from django.db import models
 
 # Create your models here.
+
+# practicing Foreign key relationship
+# create a model for headteacher 
+class HeadTeacher(models.Model):
+    name = models.CharField(max_length=100)
+    qualification = models.CharField(max_length=100)
+    date_appointed = models.DateField()
+
+    def __str__(self):
+        return self.name
+    
 # creating a model for students
 class Student(models.Model):
    name = models.CharField(max_length=100)
@@ -9,9 +20,13 @@ class Student(models.Model):
    guardian_name = models.CharField(max_length=100)
    guardian_address = models.TextField() 
 
+   # updating the student model to include a foreign key relationship with the HeadTeacher model
+   headteacher = models.ForeignKey('HeadTeacher', on_delete=models.PROTECT, related_name='students')
+
    def __str__(self):
        return self.name
    
+
 # ORM (Object Relational Mapping) is a technique that allows you to interact with a database using Python objects instead of writing raw SQL queries. Django's ORM provides a high-level abstraction for working with databases, making it easier to perform CRUD (Create, Read, Update, Delete) operations on your models.
 #In [1]: from book_store.models import Student
 
@@ -64,3 +79,4 @@ class Student(models.Model):
 #Maame Nyarko 14
 
 # In this example, i implemented the CRUD operations (CREATE, READ, and DELETE operations) in Django ORM . there is no example of Update though. thus for U.
+
