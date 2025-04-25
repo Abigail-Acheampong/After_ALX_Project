@@ -59,7 +59,8 @@ class Student(models.Model):
 #In [19]: all_students = Student.objects.all()
 
 #In [20]: for student in all_students:
-    ...:     #print(student.name, student.age)
-    ...:
+#    ...:     #print(student.name, student.age)
+#   ...:
 #Maame Nyarko 14
 
+# In this example, i implemented the CRUD operations (CREATE, READ, and DELETE operations) in Django ORM . there is no example of Update though. thus for U.
