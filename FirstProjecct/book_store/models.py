@@ -11,49 +11,18 @@ class HeadTeacher(models.Model):
 
     def __str__(self):
         return self.name
-
-# creating a fee model
-class Fee(models.Model):
-    GRADE_CHOICES = [(i, f'Grade {i}') for i in range(1, 9)]  
     
-    grade = models.IntegerField(choices=GRADE_CHOICES, unique = True)
-    amount = models.DecimalField(max_digits=8, decimal_places=2)
-    due_date = models.DateField()
-    academic_year = models.CharField(max_length=9)
-    
-    def __str__(self):
-        return f'Grade {self.grade} - GHc{self.amount}'
-    
-# I am thinking that the grade in both model should be linked together.
 # creating a model for students
 class Student(models.Model):
    name = models.CharField(max_length=100)
    age = models.IntegerField()
-   grade = models.IntegerField(choices=Fee.GRADE_CHOICES) 
+   grade = models.IntegerField() 
    guardian_name = models.CharField(max_length=100)
    guardian_address = models.TextField() 
 
    # updating the student model to include a foreign key relationship with the HeadTeacher model
    headteacher = models.ForeignKey('HeadTeacher', on_delete=models.PROTECT, related_name='students')
 
-   #updating the student model to include the fee model
-   fee = models.ForeignKey('Fee', on_delete=models.SET_NULL, null = True, blank =True)
-
-   def save(self, *args, **kwargs):
-       if not self.fee_id and self.grade:
-           self.fee = Fee.objects.filter(grade=self.grade).first()
-       super().save(*args, **kwargs)
-   
-   @property
-   def amount(self):
-    "Get fee amount from linked Fee record"
-    return self.fee.amount if self.fee else None
-   
-   @property
-   def due_date(self):
-    "Get due_date from linked Fee record"
-    return self.fee.due_date if self.fee else None
-   
    def __str__(self):
        return self.name
    

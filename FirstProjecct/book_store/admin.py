@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Student, HeadTeacher, Fee
+from .models import Student, HeadTeacher
 
 # customizing the admin interface for the Student model
 class StudentAdmin(admin.ModelAdmin):
@@ -13,15 +13,11 @@ class HeadTeacherAdmin(admin.ModelAdmin):
     list_display = ('name', 'qualification', 'date_appointed')
     search_fields = ('name',)
     list_filter = ('date_appointed',)
-
-class FeeAdmin(admin.ModelAdmin):
-    list_display = ('grade', 'amount', 'due_date')
-    list_editable = ('amount', 'due_date')
-
+    
 # Register the Student model with the admin site
 admin.site.register(Student, StudentAdmin)
 admin.site.register(HeadTeacher, HeadTeacherAdmin)
-admin.site.register(Fee, FeeAdmin) 
+
 # This will allow you to manage Student records through the Django admin interface.
 
 
