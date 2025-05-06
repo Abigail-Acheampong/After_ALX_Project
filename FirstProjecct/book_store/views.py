@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import Student, HeadTeacher
+from .models import Student, HeadTeacher, FeeStructure 
 from django.views.generic import (CreateView, ListView, DetailView, UpdateView, DeleteView, TemplateView) # for class-based views
 from django.urls import reverse_lazy 
 from django.contrib import messages
@@ -17,6 +17,29 @@ class StudentListView(TemplateView):
     template_name = 'hello.html' # in addition to the TemplateView which has been inherited, there are other generic views in Django that can be used to create views for your application. These include ListView, DetailView, CreateView, UpdateView, and DeleteView. With the use of these inheritance, we reduce the amount of codes we have to write.
 
 #Task : using the generic views in the class-based views, practice relevant operations on the student model. Move to the urls.py to define the urls for the views.
+# FeeStructure Views
+class FeeStructureCreateView(CreateView):
+    model = FeeStructure
+    fields = ['grade', 'amount', 'description', 'effective_from', 'active']
+    template_name = 'students/fee_structure_form.html'
+    success_url = reverse_lazy('fee_structure_list')
+
+class FeeStructureListView(ListView):
+    model = FeeStructure
+    template_name = 'students/fee_structure_list.html'
+    context_object_name = 'fee_structures'
+
+class FeeStructureUpdateView(UpdateView):
+    model = FeeStructure
+    fields = ['grade', 'amount', 'description', 'effective_from', 'active']
+    template_name = 'students/fee_structure_form.html'
+    success_url = reverse_lazy('fee_structure_list')
+
+class FeeStructureDeleteView(DeleteView):
+    model = FeeStructure
+    template_name = 'students/fee_structure_confirm_delete.html'
+    success_url = reverse_lazy('fee_structure_list')
+
 class StudentCreateView(CreateView):
     model = Student
     fields = ['name', 'age', 'grade', 'guardian_name', 'guardian_address']
@@ -25,13 +48,21 @@ class StudentCreateView(CreateView):
 
     def form_valid(self, form):
         try:
+            # Automatically assign the latest headteacher
             latest_headteacher = HeadTeacher.objects.latest('id')
             form.instance.headteacher = latest_headteacher
-            messages.success(self.request, f'Student assigned to {latest_headteacher.name}')
+
+            # Automatically assign the fee structure based on the student's grade
+            fee_structure = FeeStructure.objects.filter(grade=form.instance.grade).first()
+            if fee_structure:
+                form.instance.fee_structure = fee_structure
+                messages.success(self.request, f'Student assigned to {latest_headteacher.name} and Fee Structure for Grade {fee_structure.grade}')
+            else:
+                messages.warning(self.request, f'No Fee Structure found for Grade {form.instance.grade}. Please create one.')
+
             return super().form_valid(form)
         except HeadTeacher.DoesNotExist:
-            messages.error(self.request, 'No headteacher exist! Please create one first.')
-            return self.form_invalid(form)
+            messages.error(self.request, 'No headteacher exists! Please create one first.')
         
 class StudentListView(ListView):
     model = Student
@@ -50,6 +81,16 @@ class StudentUpdateView(UpdateView):
     fields = ['name', 'age', 'grade', 'guardian_name', 'guardian_address']
     template_name = 'students/student_form.html'  
     success_url = reverse_lazy('student_list')
+
+    def form_valid(self, form):
+        # Automatically update the fee structure based on the updated grade
+        fee_structure = FeeStructure.objects.filter(grade=form.instance.grade).first()
+        if fee_structure:
+            form.instance.fee_structure = fee_structure
+            messages.success(self.request, f'Fee Structure for Grade {fee_structure.grade} assigned.')
+        else:
+            messages.warning(self.request, f'No Fee Structure found for Grade {form.instance.grade}. Please create one.')
+        return super().form_valid(form)
 
 class StudentDeleteView(DeleteView):
     model = Student

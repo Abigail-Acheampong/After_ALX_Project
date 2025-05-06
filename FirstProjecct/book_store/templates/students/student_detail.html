@@ -20,7 +20,14 @@
      <strong>Grade:</strong> {{ student.grade }}<br>
      <strong>Guardian Name:</strong> {{ student.guardian_name }}<br>
      <strong>Guardian Address:</strong> {{ student.guardian_address }}<br>
-     <strong>Headteacher:</strong> {{ student.headteacher }}z
+     <strong>Headteacher:</strong> {{ student.headteacher }}<br>
+     <strong>Fee Structure:</strong>
+     {% if student.fee_structure %}
+     Grade {{ student.fee_structure.grade }} - {{ student.fee_structure.amount }}
+     {% else %}
+     No fee structure assigned
+     {% endif %}
+     <br>
     </p>
 
     <div class="mt-3">
