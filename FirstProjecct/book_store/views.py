@@ -4,6 +4,8 @@ from .models import Student, HeadTeacher, FeeStructure
 from django.views.generic import (CreateView, ListView, DetailView, UpdateView, DeleteView, TemplateView) # for class-based views
 from django.urls import reverse_lazy 
 from django.contrib import messages
+from django.contrib.auth.forms import UserCreationForm
+
 
 # function-based view
 def index(request):
@@ -96,3 +98,8 @@ class StudentDeleteView(DeleteView):
     model = Student
     template_name = 'students/student_confirm_delete.html'  
     success_url = reverse_lazy('student_list')
+
+class SignUpView(CreateView):
+    form_class = UserCreationForm
+    success_url = reverse_lazy("login")
+    template_name = "registration/signup.html"

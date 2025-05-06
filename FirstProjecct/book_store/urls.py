@@ -1,7 +1,7 @@
-from django.urls import path 
+from django.urls import path, include
 from .import views
 from .views import (StudentListView,StudentCreateView,StudentDetailView,StudentUpdateView,StudentDeleteView,
-FeeStructureCreateView, FeeStructureListView, FeeStructureUpdateView, FeeStructureDeleteView,)
+FeeStructureCreateView, FeeStructureListView, FeeStructureUpdateView, FeeStructureDeleteView, )
 
 urlpatterns = [
     # FeeStructure URLs
@@ -15,5 +15,6 @@ urlpatterns = [
     path('create/', StudentCreateView.as_view(), name='student_create'),
     path('<int:pk>/', StudentDetailView.as_view(), name='student_detail'),
     path('<int:pk>/update/', StudentUpdateView.as_view(), name='student_update'),
-    path('<int:pk>/delete/', StudentDeleteView.as_view(), name='student_delete')
+    path('<int:pk>/delete/', StudentDeleteView.as_view(), name='student_delete'),
+
 ]
