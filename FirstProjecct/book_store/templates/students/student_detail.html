@@ -30,10 +30,29 @@
      <br>
     </p>
 
+    <!-- Payment Plan Section -->
+    <h2 class="mt-4">Payment Plan</h2>
+    {% if student.payment_plan %}
+    <p><strong>Total Fee:</strong> {{ student.payment_plan.total_fee }}</p>
+    <p><strong>Amount Paid:</strong> {{ student.payment_plan.amount_paid }}</p>
+    <p><strong>Balance:</strong> {{ student.payment_plan.balance }}</p>
+
+    <h3>Payment History</h3>
+    <ul>
+     {% for payment in student.payment_plan.payments.all %}
+     <li>{{ payment.date }}: {{ payment.amount }} - {{ payment.description }}</li>
+     {% endfor %}
+    </ul>
+    
+
     <div class="mt-3">
      <a href="{% url 'student_update' student.pk %}" class="btn btn-warning">Edit</a>
      <a href="{% url 'student_delete' student.pk %}" class="btn btn-danger">Delete</a>
      <a href="{% url 'student_list' %}" class="btn btn-secondary">Back to List</a>
+     <a href="{% url 'payment_create' student.id %}" class="btn btn-primary">Add Payment</a>
+     {% else %}
+     <p>No payment plan available for this student.</p>
+     {% endif %}
     </div>
    </div>
   </div>

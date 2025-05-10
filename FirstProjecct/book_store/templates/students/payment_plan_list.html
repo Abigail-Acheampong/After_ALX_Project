@@ -1,0 +1,9 @@
+<h1>Payment Plans</h1>
+<ul>
+ {% for plan in payment_plans %}
+ <li>
+  <a href="{% url 'payment_plan_detail' plan.pk %}">{{ plan.student.name }}</a> - Total Fee: {{ plan.total_fee }} -
+  Balance: {{ plan.balance }}
+ </li>
+ {% endfor %}
+</ul>

@@ -1,5 +1,8 @@
 from django.db import models
-
+from django.contrib.auth.models import User 
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+from decimal import Decimal
 # Create your models here.
 
 # practicing Foreign key relationship
@@ -40,11 +43,63 @@ class Student(models.Model):
         # Automatically assign fee structure based on grade
         if not self.fee_structure:
             self.fee_structure = FeeStructure.objects.filter(grade=self.grade).first()
+        
+        # Automatically assign the latest HeadTeacher if not provided
+        if not self.headteacher:
+            self.headteacher = HeadTeacher.objects.latest('id')  # Get the latest HeadTeacher by ID
+            
         super().save(*args, **kwargs)
 
    def __str__(self):
        return self.name
- 
+
+@receiver(post_save, sender=Student)
+def create_payment_plan(sender, instance, created, **kwargs):
+    if created and instance.fee_structure:
+        PaymentPlan.objects.create(
+            student=instance,
+            total_fee=instance.fee_structure.amount
+        )
+        
+# incorporating other models targetted to payments of the fees ie payment plan and payment
+#Payment plan acting as a summary of the student's payment for the term
+class PaymentPlan(models.Model):
+    student = models.OneToOneField(Student, on_delete=models.CASCADE, related_name='payment_plan')
+    total_fee = models.DecimalField(max_digits=10, decimal_places=2)
+    amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+
+    def save(self, *args, **kwargs):
+        self.balance = self.total_fee - self.amount_paid
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Payment Plan for {self.student.name} - Total Fee: {self.total_fee}, Amount Paid: {self.amount_paid}, Balance: {self.balance}"
+    
+# Payment model to record individual payments made by the student
+class Payment(models.Model):
+    payment_plan = models.ForeignKey(PaymentPlan, on_delete=models.CASCADE, related_name='payments')
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    date = models.DateField(auto_now_add=True)
+    description = models.CharField(max_length=200, blank=True)
+
+    def __str__(self):
+        return f"Payment of {self.amount} for {self.payment_plan.student.name} on {self.date}"
+
+@receiver(post_save, sender=Payment)
+def update_payment_plan_on_save(sender, instance, **kwargs):
+    payment_plan = instance.payment_plan
+    payment_plan.amount_paid = sum(payment.amount for payment in payment_plan.payments.all())
+    payment_plan.save()
+
+
+@receiver(post_delete, sender=Payment)
+def update_payment_plan_on_delete(sender, instance, **kwargs):
+    payment_plan = instance.payment_plan
+    payment_plan.amount_paid = sum(payment.amount for payment in payment_plan.payments.all())
+    payment_plan.save()
+
+
 
 # ORM (Object Relational Mapping) is a technique that allows you to interact with a database using Python objects instead of writing raw SQL queries. Django's ORM provides a high-level abstraction for working with databases, making it easier to perform CRUD (Create, Read, Update, Delete) operations on your models.
 #In [1]: from book_store.models import Student

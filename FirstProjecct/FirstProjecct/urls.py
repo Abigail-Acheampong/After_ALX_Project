@@ -17,11 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import TemplateView
-from book_store.views import SignUpView  # Replace 'myapp' with your app name
+from book_store.views import SignUpView
 
 urlpatterns = [
     path('books/', include('book_store.urls')),    
     path('admin/', admin.site.urls),
+
+    # important to keep these urls here because:
+    # authentication affect the whole project not just the app
+    # the first url is part of Django's built-in authentication system
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/profile/', TemplateView.as_view(template_name='accounts/profile.html'),
              name='profile'),

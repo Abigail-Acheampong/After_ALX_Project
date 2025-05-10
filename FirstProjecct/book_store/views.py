@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import Student, HeadTeacher, FeeStructure 
+from .models import Student, HeadTeacher, FeeStructure, PaymentPlan, Payment
 from django.views.generic import (CreateView, ListView, DetailView, UpdateView, DeleteView, TemplateView) # for class-based views
 from django.urls import reverse_lazy 
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import get_object_or_404
 
 
 # function-based view
@@ -103,3 +104,62 @@ class SignUpView(CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy("login")
     template_name = "registration/signup.html"
+
+# implementing CRUD operations for PaymentPlan and Payment models
+#Payment plan is automatically created when a student is created, hence no need for a create view. plus there should be no manual adjustment of fees, hence no update view, left with list, and view.
+class PaymentPlanListView(ListView):
+    model = PaymentPlan
+    template_name = 'students/payment_plan_list.html'
+    context_object_name = 'payment_plans'  
+
+class PaymentPlanDetailView(DetailView):
+    model = PaymentPlan
+    template_name = 'students/payment_plan_detail.html'  
+    context_object_name = 'payment_plan'
+
+class PaymentCreateView(CreateView):
+    model = Payment
+    fields = ['amount', 'description']
+    template_name = 'students/payment_form.html'
+    success_url = reverse_lazy('payment_plan_list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        student_id = self.kwargs['student_id']
+        context['student'] = get_object_or_404(Student, pk=student_id)
+        return context
+
+    def form_valid(self, form):
+        # Get the student and their payment plan
+        student_id = self.kwargs['student_id']
+        student = get_object_or_404(Student, pk=student_id)
+        form.instance.payment_plan = student.payment_plan
+
+        # Save the payment and update the payment plan
+        payment_plan = form.instance.payment_plan
+        payment_plan.amount_paid += form.instance.amount
+        payment_plan.save()
+
+        return super().form_valid(form)
+    
+class PaymentListView(ListView):
+    model = Payment
+    template_name = 'payment_list.html'
+    context_object_name = 'payments'
+
+    def get_queryset(self):
+        # Filter payments by a specific payment plan
+        payment_plan_id = self.kwargs['payment_plan_id']
+        return Payment.objects.filter(payment_plan_id=payment_plan_id)
+
+class PaymentUpdateView(UpdateView):
+    model = Payment
+    fields = ['amount', 'description']
+    template_name = 'payment_form.html'
+    success_url = reverse_lazy('payment_plan_list')
+
+
+class PaymentDeleteView(DeleteView):
+    model = Payment
+    template_name = 'payment_confirm_delete.html'
+    success_url = reverse_lazy('payment_plan_list')

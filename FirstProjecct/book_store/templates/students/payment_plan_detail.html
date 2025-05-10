@@ -1,0 +1,12 @@
+<h1>Payment Plan for {{ payment_plan.student.name }}</h1>
+<p>Total Fee: {{ payment_plan.total_fee }}</p>
+<p>Amount Paid: {{ payment_plan.amount_paid }}</p>
+<p>Balance: {{ payment_plan.balance }}</p>
+
+<h2>Payments</h2>
+<ul>
+ {% for payment in payment_plan.payments.all %}
+ <li>{{ payment.date }}: {{ payment.amount }} - {{ payment.description }}</li>
+ {% endfor %}
+</ul>
+<a href="{% url 'payment_create' %}">Add Payment</a>
