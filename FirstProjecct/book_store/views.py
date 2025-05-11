@@ -69,10 +69,24 @@ class StudentCreateView(CreateView):
         
 class StudentListView(ListView):
     model = Student
-    template_name = 'students/student_list.html'  
-    context_object_name = 'students'  
-    #paginate_by = 10  # Number of items per page (optional)
-    #ordering = ['name']  # Order by name (optional)
+    template_name = 'students/student_list.html'
+    context_object_name = 'students'
+
+    def get_queryset(self):
+        queryset = super().get_queryset().order_by('-id')
+        grade = self.kwargs.get('grade')
+        if grade is not None:
+            return Student.objects.filter(grade=grade).order_by('name')[:10]
+        # Always limit to 10 students for display
+        return Student.objects.all().order_by('-id')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Distinct grades for filter links
+        context['grades'] = Student.objects.values_list('grade', flat=True).distinct().order_by('grade')
+        context['selected_grade'] = self.kwargs.get('grade')
+        context['total_students'] = Student.objects.count() 
+        return context
 
 class StudentDetailView(DetailView):
     model = Student

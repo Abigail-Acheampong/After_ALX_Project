@@ -14,6 +14,7 @@ urlpatterns = [
     
     # path('', views.index, name='index'),
     path('', StudentListView.as_view(), name='student_list'),
+    path('grade/<int:grade>/', StudentListView.as_view(), name='student_list_by_grade'),
     path('create/', StudentCreateView.as_view(), name='student_create'),
     path('<int:pk>/', StudentDetailView.as_view(), name='student_detail'),
     path('<int:pk>/update/', StudentUpdateView.as_view(), name='student_update'),
