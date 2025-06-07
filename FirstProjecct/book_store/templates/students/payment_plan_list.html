@@ -30,7 +30,11 @@
        <td>{{ plan.balance }}</td>
        <td>
         <a href="{% url 'payment_plan_detail' plan.pk %}" class="btn btn-primary btn-sm">View</a>
-       </td>
+        {% if plan.payments.last %}
+        <a href="{% url 'payment_receipt' plan.payments.last.pk %}" class="btn btn-success btn-sm ms-2" target="_blank">Print
+         Receipt</a>
+        {% endif %}
+        </td>
       </tr>
       {% endfor %}
      </tbody>

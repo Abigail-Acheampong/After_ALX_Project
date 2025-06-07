@@ -4,24 +4,40 @@
 <head>
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>Student List</title>
+ <title>Fee Structures</title>
  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
  <div class="container mt-4">
-<h1>Fee Structures</h1>
-<ul>
- {% for fee in fee_structures %}
- <li>
-  Grade {{ fee.grade }} - {{ fee.amount }}
-  <a href="{% url 'fee_structure_update' fee.pk %}">Edit</a>
-  <a href="{% url 'fee_structure_delete' fee.pk %}">Delete</a>
- </li>
- {% endfor %}
-</ul>
-<a href="{% url 'fee_structure_create' %}">Add New Fee Structure</a>
-
+  <h1>Fee Structures</h1>
+  <table class="table table-striped">
+   <thead>
+    <tr>
+     <th>Grade</th>
+     <th>Amount</th>
+     <th>Effective From</th>
+     <th>Actions</th>
+    </tr>
+   </thead>
+   <tbody>
+    {% for fee in fee_structures %}
+    <tr>
+     <td>{{ fee.grade }}</td>
+     <td>{{ fee.amount }}</td>
+     <td>{{ fee.effective_from }}</td>
+     <td>
+      <a href="{% url 'fee_structure_update' fee.pk %}" class="btn btn-warning btn-sm">Edit</a>
+      <a href="{% url 'fee_structure_delete' fee.pk %}" class="btn btn-danger btn-sm">Delete</a>
+     </td>
+    </tr>
+    {% endfor %}
+   </tbody>
+  </table>
+  <a href="{% url 'fee_structure_create' %}" class="btn btn-primary mb-2">Add New Fee Structure</a>
+  <br>
+  <a href="{% url 'student_list' %}" class="btn btn-outline-secondary mb-3 mt-2">Back to Student List</a>
+ </div>
  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

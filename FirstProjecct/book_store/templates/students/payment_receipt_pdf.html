@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+ <meta charset="UTF-8">
+ <title>Payment Receipt</title>
+ <style>
+  body {
+   font-family: Arial, sans-serif;
+   margin: 2em;
+  }
+
+  .header {
+   font-size: 1.5em;
+   margin-bottom: 1em;
+  }
+
+  .field {
+   margin-bottom: 0.5em;
+  }
+
+  .badge {
+   width: 80px;
+   height: 80px;
+   object-fit: contain;
+   margin-bottom: 0.5em;
+  }
+ </style>
+</head>
+
+<body>
+ <div style="text-align:center;">
+  <img src="{% static 'images/badge.png' %}" alt="School Badge" class="badge">
+  <div class="header">EL-ELYON LEARNING CENTRE</div>
+  <div class="field" style="margin-top:-1em; margin-bottom:1em;">
+   <strong>Akokogyam, opp. KGEE spot | Contact No: 0243564771 | E-mail: el-elyon6@gmail.com</strong>
+  </div>
+  <div style="font-size:1.1em; font-weight:normal; margin-bottom:1em;">
+  OFFICIAL PAYMENT RECEIPT FOR FIRST TERM
+  </div>
+ </div>
+ <table width="100%" style="margin-bottom: 0.5em;">
+  <tr>
+   <td align="left"><strong>Receipt No.:</strong> {{ payment.pk }}</td>
+   <td align="right"><strong>Date:</strong> {{ payment.date }}</td>
+  </tr>
+ </table>
+ <div class="field"><strong>Student Name:</strong> {{ payment.payment_plan.student.name }}</div>
+ <div class="field"><strong>Class:</strong> {{ payment.payment_plan.student.grade }}</div>
+ <div class="field"><strong>Amount Paid:</strong> GH {{ payment.amount }} cedis</div>
+ <div class="field"><strong>Balance:</strong> GH {{ payment.payment_plan.balance }} cedis </div>
+
+ <div class="signature">
+  <strong>Headmaster's Signature:</strong>
+  <div style="height: 50px; border-bottom: 1px solid #000; width: 250px; margin-bottom: 0.5em;"></div>
+  <span>{{ headteacher.name }}</span>
+</body>
+
+</html>
